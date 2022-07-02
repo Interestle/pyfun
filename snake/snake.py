@@ -1,3 +1,4 @@
+from ctypes import sizeof
 import pygame
 import random
 
@@ -22,13 +23,13 @@ def main():
     snake_speed  = 5    
 
     # Put the snake head somewhere around the center of the screen. (somewhere from 1/4 to 3/4 around the screen)
-    snake_pos = pygame.Vector2(random.randint(screen_quarter.x, screen_quarter.x * 3), \
-                               random.randint(screen_quarter.y, screen_quarter.y * 3))
+    snake_parts.append(pygame.Vector2(random.randint(screen_quarter.x, screen_quarter.x * 3), \
+                               random.randint(screen_quarter.y, screen_quarter.y * 3)))
 
+    
     # Have the snake shoot off in a random direction with constant speed
-    snake_direction = pygame.Vector2(1,0) #pygame.Vector2.normalize(pygame.Vector2(random.uniform(-1, 1), random.uniform(-1,1)))
+    snake_direction = pygame.Vector2.normalize(pygame.Vector2(random.uniform(-1, 1), random.uniform(-1,1)))
     snake_direction *= snake_speed
-
 
     # Pellet
     pellet_size = 10
@@ -36,6 +37,7 @@ def main():
     pellet_pos = pygame.Vector2(random.randint(screen_quarter.x / 2, screen_quarter.x / 2 * 7), \
                                 random.randint(screen_quarter.y / 2, screen_quarter.y / 2 * 7))
 
+    score = 0
 
     running = True
     while running:
@@ -45,11 +47,43 @@ def main():
                 running = False
                 break
 
+        # Update logic
         key = pygame.key.get_pressed()
         if key[pygame.K_ESCAPE]: 
             running = False
             break
+        if key[pygame.K_LEFT]:
+            snake_direction = snake_direction.rotate(-10)
+        if key[pygame.K_RIGHT]:
+            snake_direction = snake_direction.rotate(10)
+
+        if key[pygame.K_SPACE]:
+            continue
+
         
+        # Snake logic
+        if snake_parts[0].x > screen_size.x or snake_parts[0].x < 0 or  \
+           snake_parts[0].y > screen_size.y or snake_parts[0].y < 0:
+           #TODO: end game, give score...
+            running = False
+        
+        old_part = snake_parts[0]
+        # Update snake part positions
+        for i in range(1,len(snake_parts)):
+            print('\t', i,": ", snake_parts[i])
+            temp = snake_parts[i]
+            snake_parts[i] = old_part
+            old_part = temp
+            
+        snake_parts[0] += snake_direction
+
+        # Pellet logic
+        if snake_parts[0].distance_to(pellet_pos) < 20:
+            score += 1
+            pellet_pos = pygame.Vector2(random.randint(screen_quarter.x / 2, screen_quarter.x / 2 * 7), \
+                                random.randint(screen_quarter.y / 2, screen_quarter.y / 2 * 7))
+            print("HIT!")
+            snake_parts.append(snake_parts[0])
 
         # Draw onto the screen
         screen.fill(screen_color)
@@ -58,9 +92,11 @@ def main():
         pygame.draw.circle(screen, pellet_color, pellet_pos, pellet_size)
 
         # Draw snake
-        snake_pos += snake_direction
-        pygame.draw.circle(screen, snake_color, snake_pos, snake_size)
-
+        
+        
+        # Draw body
+        for part in snake_parts:
+            pygame.draw.circle(screen, snake_color, part, snake_size)
 
         pygame.display.update()
         clock.tick(30)
