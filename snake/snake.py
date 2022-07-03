@@ -1,6 +1,6 @@
-from turtle import clear
-import pygame
 import random
+import pygame
+
 
 def main():
     
@@ -30,6 +30,8 @@ def main():
     snake_parts.append(pygame.Vector2(200,200))
     snake_parts.append(pygame.Vector2(300,300))
     snake_parts.append(pygame.Vector2(400,400))
+    snake_parts.append(pygame.Vector2(500,500))
+    snake_parts.append(pygame.Vector2(600,600))
     
     # Have the snake shoot off in a random direction with constant speed
     snake_direction = pygame.Vector2.normalize(pygame.Vector2(random.uniform(-1, 1), random.uniform(-1,1)))
@@ -62,20 +64,25 @@ def main():
             snake_direction = snake_direction.rotate(10)
 
         if key[pygame.K_SPACE]:
-            continue
+            pygame.time.wait(5000)
+            
 
         
         # Snake logic
-        if snake_parts[0].x > screen_size.x or snake_parts[0].x < 0 or  \
-           snake_parts[0].y > screen_size.y or snake_parts[0].y < 0:
-           #TODO: end game, give score...
+        if snake_parts[0].x > screen_size.x or snake_parts[0].x < 0 or snake_parts[0].y > screen_size.y or snake_parts[0].y < 0:
+            #TODO: end game, give score...
             running = False
         
         # Update snake part positions
-        for i in range(len(snake_parts)-1, 0, -1):
-            print('\t', i,": ", snake_parts[i])
+        # in C/C++:
+        # for (int i = snake_parts.length()-1; i > 0; i--) {
+        #     snake_parts[i] = snake_parts[i-1]
+        # }
+        print("")
+        for i in range(len(snake_parts)-1,0,-1):
+            print(i,': ',  snake_parts[i], ' -> ', snake_parts[i-1])
+            #print('\t', )
             snake_parts[i] = snake_parts[i-1]
-            print('\t', i,": ", snake_parts[i])
             
         snake_parts[0] += snake_direction               
 
@@ -85,7 +92,7 @@ def main():
             pellet_pos = pygame.Vector2(random.randint(screen_quarter.x / 2, screen_quarter.x / 2 * 7), \
                                 random.randint(screen_quarter.y / 2, screen_quarter.y / 2 * 7))
             print("HIT!")
-            snake_parts.append(snake_parts[len(snake_parts) - 1])
+            snake_parts.append(snake_parts[-1])
 
         # Draw onto the screen
         screen.fill(screen_color)
@@ -93,14 +100,13 @@ def main():
         # Draw Pellet
         pygame.draw.circle(screen, pellet_color, pellet_pos, pellet_size)
 
-        # Draw snake
-        
+        # Draw snake        
         # Draw body
         for part in snake_parts:
             pygame.draw.circle(screen, snake_color, part, snake_size)
 
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(10)
         
     pygame.quit()
 
