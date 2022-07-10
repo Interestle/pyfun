@@ -82,7 +82,8 @@ def main():
         for i in range(len(snake_parts)-1,0,-1):
             print(i,': ',  snake_parts[i], ' -> ', snake_parts[i-1])
             #print('\t', )
-            snake_parts[i] = snake_parts[i-1]
+            snake_parts[i].x = snake_parts[i-1].x
+            snake_parts[i].y = snake_parts[i-1].y
             
         snake_parts[0] += snake_direction               
 
@@ -106,7 +107,7 @@ def main():
             pygame.draw.circle(screen, snake_color, part, snake_size)
 
         pygame.display.update()
-        clock.tick(10)
+        clock.tick(30)
         
     pygame.quit()
 
